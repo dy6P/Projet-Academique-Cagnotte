@@ -76,3 +76,8 @@ def calculate(name: str):
     cursor = db.cursor()
     cursor.execute(f"SELECT participant, amount FROM {name}")
     resultat = cursor.fetchall()
+    nb_participants = len(resultat)
+    total =  0
+    for expense in resultat:
+        total += expense[1]
+    mean = total / nb_participants
