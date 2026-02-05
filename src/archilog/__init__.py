@@ -70,5 +70,9 @@ def delete_expense(cagnotte_name: str, participant_name: str):
     db.commit()
     click.echo(f"{participant_name} has retired his expense in the cagnotte {cagnotte_name}.")
 
-def calculate():
-    pass
+@cli.command()
+@click.option("--name", prompt="Cagnotte name", help="The name of the cagnotte.")
+def calculate(name: str):
+    cursor = db.cursor()
+    cursor.execute(f"SELECT participant, amount FROM {name}")
+    resultat = cursor.fetchall()
