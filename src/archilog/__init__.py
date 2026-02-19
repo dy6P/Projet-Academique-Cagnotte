@@ -14,7 +14,7 @@ class Item:
 def cli():
     pass
 
-db = sqlite3.connect("CAGNOTTE.db")
+db = sqlite3.connect("storage/CAGNOTTE.db")
 
 @cli.command()
 def all_cagnotte():
