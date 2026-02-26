@@ -1,63 +1,60 @@
 import click
 
-from src.archilog.data import (
-    create_expense,
-    delete_expense,
-    delete_cagnotte,
-    all_cagnottes,
-    create_cagnotte,
+from .data import (
+    create_expense as create_expense_service,
+    delete_expense as delete_expense_service,
+    delete_cagnotte as delete_cagnotte_service,
+    all_cagnottes as all_cagnottes_service,
+    create_cagnotte as create_cagnotte_service,
 )
 
-from src.archilog.domain import describe_cagnotte_transactions
+from .domain import describe_cagnotte_transactions as describe_cagnotte_transactions_service
 
 @click.group()
 def cli() -> None:
     pass
 
-@cli.command(help="Initialize the database.")
+@cli.command(help="Create a cagnotte.")
+@click.option("-cn", "--cagnotte_name", prompt="Cagnotte name ", required=True)
 def create_cagnotte(cagnotte_name: str) -> None:
-    create_cagnotte(cagnotte_name)
+    create_cagnotte_service(cagnotte_name)
 
 
 @cli.command(help="Get the list of all cagnottes.")
 def all_cagnottes() -> None:
-    for c in all_cagnottes():
+    for c in all_cagnottes_service():
         click.echo(c.name)
 
 @cli.command(help="Get details of a cagnotte.")
-@click.option("-m", "--cagnotte_name", required=True)
+@click.option("-cn", "--cagnotte_name", prompt="Cagnotte name ", required=True)
 def describe_cagnotte_transactions(cagnotte_name: str) -> None:
-    mp, transactions = describe_cagnotte_transactions(cagnotte_name)
-
-    click.echo("The money pot contains:")
-    for e in mp.expenses:
-        click.echo(f"  {e.paid_by} : {e.amount}€ ({e.datetime})")
-
-    click.echo("To balance the money pot:")
+    cagnotte, transactions = describe_cagnotte_transactions_service(cagnotte_name)
+    click.echo("The Cagnotte contains : ")
+    for e in cagnotte.expenses:
+        click.echo(f"{e.participant_name} : {e.amount}€ ({e.date})")
+    click.echo("To balance the cagnotte : ")
     if transactions:
         for t in transactions:
-            click.echo(f"  {t.sender} must send {t.amount}€ to {t.receiver}.")
+            click.echo(f"{t.sender_name} must send {t.amount}€ to {t.receiver_name}.")
     else:
-        click.echo("  Nothing to do.")
+        click.echo("Nothing to do.")
 
 @cli.command(help="Delete a cagnotte with all associated expenses.")
-@click.option("-m", "--cagnotte_name", required=True)
+@click.option("-cn", "--cagnotte_name", prompt="Cagnotte name ", required=True)
 def delete_cagnotte(cagnotte_name: str) -> None:
-    delete_cagnotte(cagnotte_name)
+    delete_cagnotte_service(cagnotte_name)
 
 
 @cli.command(help="Add an expense to a cagnotte, create a cagnotte if needed.")
-@click.option("-m", "--cagnotte_name", required=True)
-@click.option("-p", "--participant_name", required=True)
-@click.option("-a", "--amount", type=float, required=True)
+@click.option("-cn", "--cagnotte_name", prompt="Cagnotte name ", required=True)
+@click.option("-pn", "--participant_name", prompt="Participant name ", required=True)
+@click.option("-a", "--amount", prompt="Amount ", required=True)
 def add_expense(cagnotte_name: str, participant_name: str, amount: float) -> None:
-    create_expense(cagnotte_name, participant_name, amount)
+    create_expense_service(cagnotte_name, participant_name, amount)
 
 
-@cli.command(
-    help="Remove an expense from a money pot, delete the money pot if no more expense."
-)
-@click.option("-m", "--cagnotte_name-pot", required=True)
-@click.option("-p", "--participant_name-by", required=True)
+@cli.command(help="Remove an expense from a money pot, delete the money pot if no more expense.")
+@click.option("-cn", "--cagnotte_name", prompt="Cagnotte name ", required=True)
+@click.option("-pn", "--participant_name", prompt="Participant name ", required=True)
 def remove_expense(cagnotte_name: str, participant_name: str) -> None:
-    delete_expense(cagnotte_name, participant_name)
+    delete_expense_service(cagnotte_name, participant_name)

@@ -1,7 +1,6 @@
 import sqlite3
 from dataclasses import dataclass, field
 from datetime import date
-from data import Expense
 
 db_url = "storage/CAGNOTTE.db"
 db = None
@@ -20,7 +19,7 @@ class Expense:
     date: date
 
     @classmethod
-    def create_expense(cls, cagnotte_name: str, row: tuple) -> Expense:
+    def create_expense(cls, cagnotte_name: str, row: tuple):
         participant, amount, date_str = row
         return cls(
             cagnotte=cagnotte_name,

@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 
-from src.archilog.data import Cagnotte, describe_cagnotte
+from .data import Cagnotte, describe_cagnotte
 
 @dataclass
 class MeanDeviation:
