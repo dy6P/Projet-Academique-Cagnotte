@@ -1,6 +1,5 @@
 import click
-
-from flask import render_template, request, redirect, url_for, Flask
+from flask import Flask, render_template, request, redirect, url_for
 from .data import (
     add_expense as add_expense_service,
     remove_expense as remove_expense_service,
@@ -33,13 +32,9 @@ def describe_money_pot(money_pot_name: str) -> None:
         click.echo("No expenses recorded.")
     else:
         for e in money_pot.expenses:
-            click.echo(
-                f"{e.participant_name} : {e.amount}€ "
-                f"({e.datetime.strftime('%Y-%m-%d %H:%M:%S')})"
-            )
+            click.echo(f"{e.participant_name} : {e.amount}€ ({e.date} {e.time})")
 
-
-@cli.command(help="Get details of a money_pot.")
+@cli.command(help="Get details and transactions of a money_pot.")
 @click.option("-mpn", "--money_pot_name", prompt="Money_pot name ", required=True)
 def describe_money_pot_transactions(money_pot_name: str) -> None:
     money_pot, transactions = describe_money_pot_transactions_service(money_pot_name)
@@ -48,16 +43,11 @@ def describe_money_pot_transactions(money_pot_name: str) -> None:
         click.echo("No expenses recorded.")
     else:
         for e in money_pot.expenses:
-            click.echo(
-                f"{e.participant_name} : {e.amount}€ "
-                f"({e.datetime.strftime('%Y-%m-%d %H:%M:%S')})"
-            )
+            click.echo(f"{e.participant_name} : {e.amount}€ ({e.date} {e.time})")
     click.echo("To balance the money_pot : ")
     if transactions:
         for t in transactions:
-            click.echo(
-                f"{t.sender_name} must send {t.amount}€ to {t.receiver_name}."
-            )
+            click.echo(f"{t.sender_name} must send {t.amount}€ to {t.receiver_name}.")
     else:
         click.echo("Nothing to do.")
 
@@ -66,14 +56,14 @@ def describe_money_pot_transactions(money_pot_name: str) -> None:
 def delete_money_pot(money_pot_name: str) -> None:
     delete_money_pot_service(money_pot_name)
 
-@cli.command(help="Add an expense to a money_pot, create a money_pot if needed.")
+@cli.command(help="Add an expense to a money_pot.")
 @click.option("-mpn", "--money_pot_name", prompt="Money_pot name ", required=True)
 @click.option("-pn", "--participant_name", prompt="Participant name ", required=True)
 @click.option("-a", "--amount", prompt="Amount ", required=True)
 def add_expense(money_pot_name: str, participant_name: str, amount: float) -> None:
     add_expense_service(money_pot_name, participant_name, amount)
 
-@cli.command(help="Remove an expense from a money pot, delete the money pot if no more expense.")
+@cli.command(help="Remove an expense from a money pot.")
 @click.option("-mpn", "--money_pot_name", prompt="Money_pot name ", required=True)
 @click.option("-pn", "--participant_name", prompt="Participant name ", required=True)
 def remove_expense(money_pot_name: str, participant_name: str) -> None:
@@ -115,6 +105,6 @@ def remove_expense_route():
 
 @app.route("/money_pot/delete", methods=["POST"])
 def delete_money_pot_route():
-    name = request.form.get("money_pot_name").lower()
+    name = request.form.get("money_pot_name")
     delete_money_pot_service(name)
     return redirect(url_for("home"))

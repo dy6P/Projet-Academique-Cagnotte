@@ -25,12 +25,14 @@
             <th>Participant</th>
             <th>Amount</th>
             <th>Date</th>
+            <th>Time</th>
         </tr>
         {% for expense in money_pot.expenses %}
         <tr>
             <td>{{ expense.participant_name }}</td>
             <td>{{ expense.amount }}</td>
-            <td>{{ expense.datetime }}</td>
+            <td>{{ expense.date }}</td>
+            <td>{{ expense.time }}</td>
         </tr>
         {% endfor %}
     </table>

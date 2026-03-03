@@ -11,7 +11,8 @@ Expenses = Table(
     Column("money_pot", String, primary_key=True),
     Column("participant", String, primary_key=True),
     Column("amount", Float, nullable=False),
-    Column("datetime", String, nullable=False)
+    Column("date", String, nullable=False),  # YYYY-MM-DD
+    Column("time", String, nullable=False),  # HH:MM:SS
 )
 
 def init_database():
@@ -22,7 +23,8 @@ class Expense:
     money_pot_name: str
     participant_name: str
     amount: float
-    datetime: datetime
+    date: str
+    time: str
 
     @classmethod
     def from_row(cls, row):
@@ -30,7 +32,8 @@ class Expense:
             row.money_pot.lower(),
             row.participant.lower(),
             row.amount,
-            datetime.fromisoformat(row.datetime),
+            row.date,
+            row.time,
         )
 
 @dataclass
@@ -54,18 +57,21 @@ def describe_money_pot(money_pot_name: str) -> Money_pot:
     return Money_pot(money_pot_name, expenses)
 
 def add_expense(money_pot_name: str, participant_name: str, amount: float) -> None:
+    now = datetime.now()
     stmt = insert(Expenses).values(
         money_pot=money_pot_name.lower(),
         participant=participant_name.lower(),
         amount=amount,
-        datetime=datetime.now().isoformat(),
+        date=now.strftime("%Y-%m-%d"),
+        time=now.strftime("%H:%M:%S"),
     )
     with engine.begin() as conn:
         conn.execute(stmt)
 
 def remove_expense(money_pot_name: str, participant_name: str) -> None:
     stmt = delete(Expenses).where(
-        (Expenses.c.money_pot == money_pot_name.lower()) & (Expenses.c.participant == participant_name.lower())
+        (Expenses.c.money_pot == money_pot_name.lower()) &
+        (Expenses.c.participant == participant_name.lower())
     )
     with engine.begin() as conn:
         conn.execute(stmt)
