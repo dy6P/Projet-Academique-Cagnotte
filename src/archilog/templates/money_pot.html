@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ money_pot.name }} - Details</title>
+    <style>
+        table {
+            border-collapse: collapse;
+            width: 50%;
+            margin-bottom: 20px;
+        }
+        th, td {
+            border: 1px solid black;
+            padding: 5px 10px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h1>{{ money_pot.name }}</h1>
+
+    <h2>Expenses</h2>
+    <table>
+        <tr>
+            <th>Participant</th>
+            <th>Amount</th>
+            <th>Date</th>
+        </tr>
+        {% for expense in money_pot.expenses %}
+        <tr>
+            <td>{{ expense.participant_name }}</td>
+            <td>{{ expense.amount }}</td>
+            <td>{{ expense.datetime }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Transactions to Perform</h2>
+    <table>
+        <tr>
+            <th>Sender</th>
+            <th>Receiver</th>
+            <th>Amount</th>
+        </tr>
+        {% for t in transactions %}
+        <tr>
+            <td>{{ t.sender_name }}</td>
+            <td>{{ t.receiver_name }}</td>
+            <td>{{ t.amount }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h2>Add Expense</h2>
+    <form action="{{ url_for('add_expense_route') }}" method="post">
+        <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
+        <input type="text" name="participant_name" placeholder="Participant Name" required>
+        <input type="number" step="0.01" min="0.0" name="amount" placeholder="Amount" required>
+        <button type="submit">Add Expense</button>
+    </form>
+
+    <h2>Remove Expense</h2>
+    <form action="{{ url_for('remove_expense_route') }}" method="post">
+        <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
+        <select name="participant_name" required>
+            {% for e in money_pot.expenses %}
+            <option value="{{ e.participant_name }}">{{ e.participant_name }}</option>
+            {% endfor %}
+        </select>
+        <button type="submit">Remove Expense</button>
+    </form>
+
+    <form action="{{ url_for('delete_money_pot_route') }}" method="post" style="margin-top:20px;">
+        <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
+        <button type="submit" style="background-color:red; color:white; padding:5px 10px; border:none; cursor:pointer;">
+            Delete Money Pot
+        </button>
+    </form>
+
+    <p><a href="{{ url_for('home') }}">Back to home</a></p>
+</body>
+</html>
