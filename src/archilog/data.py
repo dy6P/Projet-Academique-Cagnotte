@@ -11,8 +11,8 @@ Expenses = Table(
     Column("money_pot", String, primary_key=True),
     Column("participant", String, primary_key=True),
     Column("amount", Float, nullable=False),
-    Column("date", String, nullable=False),  # YYYY-MM-DD
-    Column("time", String, nullable=False),  # HH:MM:SS
+    Column("date", String, nullable=False),
+    Column("time", String, nullable=False)
 )
 
 def init_database():
@@ -42,41 +42,39 @@ class Money_pot:
     expenses: list[Expense] = field(default_factory=list)
 
 def all_money_pots() -> list[Money_pot]:
-    stmt = select(Expenses.c.money_pot).distinct()
     with engine.connect() as conn:
-        rows = conn.execute(stmt).all()
+        rows = conn.execute(select(Expenses.c.money_pot).distinct()).all()
     return [Money_pot(r.money_pot) for r in rows]
 
 def describe_money_pot(money_pot_name: str) -> Money_pot:
-    stmt = select(Expenses).where(Expenses.c.money_pot == money_pot_name.lower())
     with engine.connect() as conn:
-        rows = conn.execute(stmt).all()
+        rows = conn.execute(select(Expenses).where(Expenses.c.money_pot == money_pot_name.lower())).all()
     if not rows:
         raise Exception(f"'{money_pot_name}' money_pot not found.")
     expenses = [Expense.from_row(r) for r in rows]
     return Money_pot(money_pot_name, expenses)
 
 def add_expense(money_pot_name: str, participant_name: str, amount: float) -> None:
+    remove_expense(money_pot_name, participant_name)
     now = datetime.now()
-    stmt = insert(Expenses).values(
-        money_pot=money_pot_name.lower(),
-        participant=participant_name.lower(),
-        amount=amount,
-        date=now.strftime("%Y-%m-%d"),
-        time=now.strftime("%H:%M:%S"),
-    )
     with engine.begin() as conn:
-        conn.execute(stmt)
+        conn.execute(
+            insert(Expenses).values(
+                money_pot=money_pot_name.lower(),
+                participant=participant_name.lower(),
+                amount=amount,
+                date=now.strftime("%Y-%m-%d"),
+                time=now.strftime("%H:%M:%S"),
+            )
+        )
 
 def remove_expense(money_pot_name: str, participant_name: str) -> None:
-    stmt = delete(Expenses).where(
+    with engine.begin() as conn:
+        conn.execute(delete(Expenses).where(
         (Expenses.c.money_pot == money_pot_name.lower()) &
         (Expenses.c.participant == participant_name.lower())
-    )
-    with engine.begin() as conn:
-        conn.execute(stmt)
+    ))
 
 def delete_money_pot(money_pot_name: str) -> None:
-    stmt = delete(Expenses).where(Expenses.c.money_pot == money_pot_name.lower())
     with engine.begin() as conn:
-        conn.execute(stmt)
+        conn.execute(delete(Expenses).where(Expenses.c.money_pot == money_pot_name.lower()))

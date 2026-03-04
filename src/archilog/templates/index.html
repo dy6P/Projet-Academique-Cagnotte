@@ -2,11 +2,10 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Money Pots Dashboard</title>
+    <title>Money Pots</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
 </head>
 <body>
-    <h1>Money Pots Dashboard</h1>
-
     <h2>New Money Pot</h2>
     <form action="{{ url_for('add_expense_route') }}" method="post">
         <input type="text" name="money_pot_name" placeholder="Money Pot Name" required>
@@ -16,7 +15,7 @@
     </form>
 
     <h2>View Money Pot</h2>
-    <form action="{{ url_for('describe_money_pot_route') }}" method="post">
+    <form action="{{ url_for('describe_money_pot_route') }}" method="get">
         <select name="money_pot_name" required>
             {% for mp in money_pots %}
             <option value="{{ mp.name }}">{{ mp.name }}</option>

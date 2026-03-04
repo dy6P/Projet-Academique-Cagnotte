@@ -10,6 +10,8 @@ from .data import (
 )
 from .domain import describe_money_pot_transactions as describe_money_pot_transactions_service
 
+# CLI
+
 @click.group()
 def cli() -> None:
     pass
@@ -70,17 +72,20 @@ def remove_expense(money_pot_name: str, participant_name: str) -> None:
     remove_expense_service(money_pot_name, participant_name)
 
 
+# GUI
 app = Flask(__name__)
 init_database_service()
 
 @app.route("/", methods=["GET"])
-def home():
+def home_route():
     money_pots = all_money_pots_service()
     return render_template("index.html", money_pots=money_pots)
 
-@app.route("/money_pot/view", methods=["POST"])
+@app.route("/describe_money_pot", methods=["GET"])
 def describe_money_pot_route():
-    name = request.form.get("money_pot_name")
+    name = request.args.get("money_pot_name")
+    if not name:
+        return redirect(url_for("home_route"))
     money_pot, transactions = describe_money_pot_transactions_service(name)
     return render_template(
         "money_pot.html",
@@ -88,23 +93,23 @@ def describe_money_pot_route():
         transactions=transactions
     )
 
-@app.route("/money_pot/add_expense", methods=["POST"])
+@app.route("/add_expense", methods=["POST"])
 def add_expense_route():
     name = request.form["money_pot_name"]
     participant = request.form["participant_name"]
     amount = float(request.form["amount"])
     add_expense_service(name, participant, amount)
-    return redirect(url_for("detail", name=name))
+    return redirect(url_for("describe_money_pot_route", money_pot_name=name))
 
-@app.route("/money_pot/remove_expense", methods=["POST"])
+@app.route("/remove_expense", methods=["POST"])
 def remove_expense_route():
     name = request.form["money_pot_name"]
     participant = request.form["participant_name"]
     remove_expense_service(name, participant)
-    return redirect(url_for("detail", name=name))
+    return redirect(url_for("describe_money_pot_route", money_pot_name=name))
 
-@app.route("/money_pot/delete", methods=["POST"])
+@app.route("/delete_money_pot", methods=["POST"])
 def delete_money_pot_route():
     name = request.form.get("money_pot_name")
     delete_money_pot_service(name)
-    return redirect(url_for("home"))
+    return redirect(url_for("home_route"))

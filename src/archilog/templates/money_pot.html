@@ -3,22 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ money_pot.name }} - Details</title>
-    <style>
-        table {
-            border-collapse: collapse;
-            width: 50%;
-            margin-bottom: 20px;
-        }
-        th, td {
-            border: 1px solid black;
-            padding: 5px 10px;
-            text-align: left;
-        }
-    </style>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style1.css') }}">
 </head>
 <body>
-    <h1>{{ money_pot.name }}</h1>
-
     <h2>Expenses</h2>
     <table>
         <tr>
@@ -37,7 +24,8 @@
         {% endfor %}
     </table>
 
-    <h2>Transactions to Perform</h2>
+    {% if transactions | length > 0 %}
+    <h2>Transactions</h2>
     <table>
         <tr>
             <th>Sender</th>
@@ -52,6 +40,7 @@
         </tr>
         {% endfor %}
     </table>
+    {% endif %}
 
     <h2>Add Expense</h2>
     <form action="{{ url_for('add_expense_route') }}" method="post">
@@ -74,11 +63,9 @@
 
     <form action="{{ url_for('delete_money_pot_route') }}" method="post" style="margin-top:20px;">
         <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
-        <button type="submit" style="background-color:red; color:white; padding:5px 10px; border:none; cursor:pointer;">
-            Delete Money Pot
-        </button>
+        <button type="submit" class="danger">Delete Money Pot</button>
     </form>
 
-    <p><a href="{{ url_for('home') }}">Back to home</a></p>
+    <p><a href="{{ url_for('home_route') }}">Back to home</a></p>
 </body>
 </html>
