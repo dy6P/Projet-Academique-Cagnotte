@@ -27,19 +27,13 @@ def calculate_transactions(money_pot: Money_pot) -> list[Transaction]:
     ]
     debtors = [m for m in mean_deviations if m.amount < 0]
     creditors = [m for m in mean_deviations if m.amount > 0]
-    transactions: list[Transaction] = []
+    transactions = []
     i = j = 0
     while i < len(debtors) and j < len(creditors):
         debtor = debtors[i]
         creditor = creditors[j]
         amount = round(min(abs(debtor.amount), creditor.amount), 2)
-        transactions.append(
-            Transaction(
-                sender_name=debtor.participant_name,
-                receiver_name=creditor.participant_name,
-                amount=amount,
-            )
-        )
+        transactions.append(Transaction(debtor.participant_name, creditor.participant_name, amount))
         debtor.amount = round(debtor.amount + amount, 2)
         creditor.amount = round(creditor.amount - amount, 2)
         if abs(debtor.amount) < 0.01:
