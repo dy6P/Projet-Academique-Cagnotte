@@ -7,7 +7,7 @@
 </head>
 <body>
     <h2>New Money Pot</h2>
-    <form action="{{ url_for('add_expense_route') }}" method="post">
+    <form action="{{ url_for('web_ui.add_expense_route') }}" method="post">
         <input type="text" name="money_pot_name" placeholder="Money Pot Name" required>
         <input type="text" name="participant_name" placeholder="Participant Name" required>
         <input type="number" step="0.01" min="0.0" name="amount" placeholder="Amount" required>
@@ -15,7 +15,7 @@
     </form>
     {% if money_pots | length > 0 %}
     <h2>View Money Pot</h2>
-    <form action="{{ url_for('describe_money_pot_route') }}" method="get">
+    <form action="{{ url_for('web_ui.describe_money_pot_route') }}" method="get">
         <select name="money_pot_name" required>
             {% for mp in money_pots %}
             <option value="{{ mp.name }}">{{ mp.name }}</option>
@@ -25,7 +25,7 @@
     </form>
 
     <h2>Delete Money Pot</h2>
-    <form action="{{ url_for('delete_money_pot_route') }}" method="post">
+    <form action="{{ url_for('web_ui.delete_money_pot_route') }}" method="post">
         <select name="money_pot_name" required>
             {% for mp in money_pots %}
             <option value="{{ mp.name }}">{{ mp.name }}</option>

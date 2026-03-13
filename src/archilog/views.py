@@ -1,5 +1,5 @@
 import click
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, Blueprint
 from .data import (
     add_expense as add_expense_service,
     remove_expense as remove_expense_service,
@@ -73,19 +73,19 @@ def remove_expense(money_pot_name: str, participant_name: str) -> None:
 
 
 # GUI
-app = Flask(__name__)
+web_ui = Blueprint("web_ui", __name__)
 init_database_service()
 
-@app.route("/", methods=["GET"])
+@web_ui.route("/", methods=["GET"])
 def home_route():
     money_pots = all_money_pots_service()
     return render_template("index.html", money_pots=money_pots)
 
-@app.route("/describe_money_pot", methods=["GET"])
+@web_ui.route("/describe_money_pot", methods=["GET"])
 def describe_money_pot_route():
     name = request.args.get("money_pot_name")
     if not name:
-        return redirect(url_for("home_route"))
+        return redirect(url_for("web_ui.home_route"))
     money_pot, transactions = describe_money_pot_transactions_service(name)
     return render_template(
         "money_pot.html",
@@ -93,23 +93,23 @@ def describe_money_pot_route():
         transactions=transactions
     )
 
-@app.route("/add_expense", methods=["POST"])
+@web_ui.route("/add_expense", methods=["POST"])
 def add_expense_route():
     name = request.form["money_pot_name"]
     participant = request.form["participant_name"]
     amount = float(request.form["amount"])
     add_expense_service(name, participant, amount)
-    return redirect(url_for("describe_money_pot_route", money_pot_name=name))
+    return redirect(url_for("web_ui.describe_money_pot_route", money_pot_name=name))
 
-@app.route("/remove_expense", methods=["POST"])
+@web_ui.route("/remove_expense", methods=["POST"])
 def remove_expense_route():
     name = request.form["money_pot_name"]
     participant = request.form["participant_name"]
     remove_expense_service(name, participant)
-    return redirect(url_for("describe_money_pot_route", money_pot_name=name))
+    return redirect(url_for("web_ui.describe_money_pot_route", money_pot_name=name))
 
-@app.route("/delete_money_pot", methods=["POST"])
+@web_ui.route("/delete_money_pot", methods=["POST"])
 def delete_money_pot_route():
     name = request.form.get("money_pot_name")
     delete_money_pot_service(name)
-    return redirect(url_for("home_route"))
+    return redirect(url_for("web_ui.home_route"))

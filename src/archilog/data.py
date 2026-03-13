@@ -1,8 +1,9 @@
 from dataclasses import dataclass, field
 from datetime import datetime
 from sqlalchemy import create_engine, MetaData, Table, Column, String, Float, select, insert, delete
+from .config import *
 
-engine = create_engine("sqlite:///storage/MONEY_POTS.db", echo=False)
+engine = create_engine(config.DATABASE_URL, echo=config.DEBUG)
 metadata = MetaData()
 
 Expenses = Table(
@@ -78,3 +79,4 @@ def remove_expense(money_pot_name: str, participant_name: str) -> None:
 def delete_money_pot(money_pot_name: str) -> None:
     with engine.begin() as conn:
         conn.execute(delete(Expenses).where(Expenses.c.money_pot == money_pot_name.lower()))
+

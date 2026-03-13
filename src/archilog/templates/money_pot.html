@@ -43,7 +43,7 @@
     {% endif %}
 
     <h2>Add Expense</h2>
-    <form action="{{ url_for('add_expense_route') }}" method="post">
+    <form action="{{ url_for('web_ui.add_expense_route') }}" method="post">
         <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
         <input type="text" name="participant_name" placeholder="Participant Name" required>
         <input type="number" step="0.01" min="0.0" name="amount" placeholder="Amount" required>
@@ -51,7 +51,7 @@
     </form>
 
     <h2>Remove Expense</h2>
-    <form action="{{ url_for('remove_expense_route') }}" method="post">
+    <form action="{{ url_for('web_ui.remove_expense_route') }}" method="post">
         <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
         <select name="participant_name" required>
             {% for e in money_pot.expenses %}
@@ -61,11 +61,11 @@
         <button type="submit">Remove Expense</button>
     </form>
 
-    <form action="{{ url_for('delete_money_pot_route') }}" method="post" style="margin-top:20px;">
+    <form action="{{ url_for('web_ui.delete_money_pot_route') }}" method="post" style="margin-top:20px;">
         <input type="hidden" name="money_pot_name" value="{{ money_pot.name }}">
         <button type="submit" class="danger">Delete Money Pot</button>
     </form>
 
-    <p><a href="{{ url_for('home_route') }}">Back to home</a></p>
+    <p><a href="{{ url_for('web_ui.home_route') }}">Back to home</a></p>
 </body>
 </html>
